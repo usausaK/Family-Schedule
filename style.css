@@ -642,7 +642,7 @@ input {
 
   .pTimelineRow {
     display: grid;
-    grid-template-columns: 18mm 20mm 6mm minmax(0, 1fr);
+    grid-template-columns: 30mm 6mm minmax(0, 1fr) 24mm;
     align-items: center;
     column-gap: 3mm;
     min-height: 7mm;
@@ -651,26 +651,11 @@ input {
 
   .pTimelineLabel {
     min-height: 7mm;
-    display: flex;
-    justify-content: flex-end;
   }
 
   .pTimelineText {
     font-size: 13.5pt;
   }
-  /* 起床・食事・お風呂・就寝は、教科ラベルより左から始める */
-  .pDailyRow .pTimelineLabel { display: none; }
-
-  .pDailyRow .pTimelineText {
-    grid-column: 2 / 5;
-    justify-self: start;
-  }
-
-  /* 教科ラベルを通常項目のチェック欄付近まで右へ寄せる */
-  .pMagnet {
-    white-space: nowrap;
-  }
-
 
   .pBoxedSmall {
     justify-self: start;
