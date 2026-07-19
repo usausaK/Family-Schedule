@@ -412,7 +412,7 @@ function buildPrintSheet() {
       pushTimeline(sec.label, it.text, it.time, "item");
     }
   }
-  pushTimeline("", "お風呂", day.bathTime, "plain");
+  pushTimeline("", "お風呂", day.bathTime, "boxed bath");
   pushTimeline("", "就寝", day.sleepTime, "boxed");
 
   timeline.sort((a, b) => {
@@ -428,10 +428,10 @@ function buildPrintSheet() {
     else previousLabel = null;
     parts.push(`
       <div class="pTimelineRow ${row.kind === "none" ? "pDim" : ""}">
+        <span class="pTime pTimeLeft">${row.time ? esc(row.time) : ""}</span>
         <div class="pTimelineLabel">${showLabel ? `<span class="pMagnet">${esc(row.label)}</span>` : ""}</div>
-        <span class="pChk ${row.kind === "boxed" || row.kind === "plain" || row.kind === "none" ? "pChkHidden" : ""}"></span>
-        <span class="pTimelineText ${row.kind === "boxed" ? "pBoxedSmall" : ""}">${esc(row.text)}</span>
-        ${row.time ? `<span class="pTime">${esc(row.time)}</span>` : ""}
+        <span class="pChk ${row.kind.includes("boxed") || row.kind === "none" ? "pChkHidden" : ""}"></span>
+        <span class="pTimelineText ${row.kind.includes("boxed") ? "pBoxedSmall" : ""} ${["朝食","昼食","夕食"].includes(row.text) ? "pMeal" : ""} ${row.text === "お風呂" ? "pBath" : ""} ${row.text === "起きる" ? "pWake" : ""} ${row.text === "就寝" ? "pSleep" : ""}">${esc(row.text)}</span>
       </div>`);
   }
   parts.push('</div>');

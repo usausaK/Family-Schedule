@@ -693,3 +693,92 @@ input {
     font-size: 12pt;
   }
 }
+
+/* 2026-07 印刷レイアウト調整: 時刻を左、低インクのハッピー配色 */
+@media print {
+  #printSheet {
+    --print-yellow: #fff7cc;
+    --print-pink: #fff0f3;
+    --print-blue: #eef7ff;
+    --print-green: #f1f8df;
+    --print-purple: #f6f0ff;
+  }
+
+  .pDateOnly {
+    display: inline-block;
+    padding: 1mm 3mm 1.5mm;
+    border-bottom: 1mm solid #b9d94f;
+  }
+
+  .pTimeline {
+    gap: 2.8mm;
+  }
+
+  .pTimelineRow {
+    grid-template-columns: 21mm 28mm 6mm minmax(0, 1fr);
+    column-gap: 3mm;
+  }
+
+  .pTimeLeft {
+    justify-self: end;
+    min-width: 18mm;
+    text-align: right;
+    font-family: "Zen Maru Gothic", sans-serif;
+    font-weight: 700;
+    font-size: 11.5pt;
+    color: #303030;
+  }
+
+  .pMagnet {
+    background: var(--print-green);
+    border: 0.45mm solid #94ae3e;
+    color: #263300;
+    box-shadow: none;
+  }
+
+  .pBoxedSmall {
+    border-width: 0.55mm;
+    border-radius: 2mm;
+    padding: 0.8mm 3mm;
+    background: #fff;
+  }
+
+  .pWake {
+    background: var(--print-yellow);
+    border-color: #c89a20;
+  }
+
+  .pBath {
+    background: var(--print-blue);
+    border-color: #5595b8;
+  }
+
+  .pSleep {
+    background: var(--print-purple);
+    border-color: #8f72ad;
+  }
+
+  .pMeal {
+    display: inline-block;
+    justify-self: start;
+    padding: 0.7mm 2.8mm;
+    border: 0.45mm solid #d99094;
+    border-radius: 999px;
+    background: var(--print-pink);
+  }
+
+  .pChk {
+    border-color: #4f7258;
+  }
+
+  .pFamilyPlan {
+    border-color: #6f6f6f;
+    background: linear-gradient(to bottom, var(--print-yellow) 0 4mm, #fff 4mm 100%);
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .pFamilyPlan:nth-child(2) {
+    background: linear-gradient(to bottom, var(--print-blue) 0 4mm, #fff 4mm 100%);
+  }
+}
