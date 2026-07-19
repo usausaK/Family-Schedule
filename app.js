@@ -87,6 +87,8 @@ function emptyDay(dateStr) {
     wakeTime: "",
     bathTime: "",
     sleepTime: "",
+    papaSchedule: "",
+    mamaSchedule: "",
     sections: DAY_TEMPLATE.map((t) => ({
       id: newId(), label: t.label, note: "", none: false,
       items: t.items.map((text) => ({ id: newId(), text: text, time: "", done: false }))
@@ -101,6 +103,8 @@ function normalize(data, dateStr) {
     wakeTime: String(d.wakeTime ?? ""),
     bathTime: String(d.bathTime ?? ""),
     sleepTime: String(d.sleepTime ?? ""),
+    papaSchedule: String(d.papaSchedule ?? ""),
+    mamaSchedule: String(d.mamaSchedule ?? ""),
     sections: Array.isArray(d.sections) ? d.sections.map((s) => ({
       id: String(s.id ?? newId()),
       label: String(s.label ?? ""),
@@ -222,6 +226,8 @@ function render() {
   setIfNotFocused('[data-k="wakeTime"]', day.wakeTime);
   setIfNotFocused('[data-k="bathTime"]', day.bathTime);
   setIfNotFocused('[data-k="sleepTime"]', day.sleepTime);
+  setIfNotFocused('[data-k="papaSchedule"]', day.papaSchedule);
+  setIfNotFocused('[data-k="mamaSchedule"]', day.mamaSchedule);
 
   $("sections").innerHTML = day.sections.map(secHTML).join("");
 }
@@ -345,6 +351,8 @@ async function copyPrev() {
         wakeTime: prev.wakeTime,
         bathTime: prev.bathTime,
         sleepTime: prev.sleepTime,
+        papaSchedule: prev.papaSchedule,
+        mamaSchedule: prev.mamaSchedule,
         sections: prev.sections.map((s) => ({
           id: newId(), label: s.label, note: s.note, none: false,
           items: s.items.map((it) => ({ id: newId(), text: it.text, time: it.time, done: false }))
@@ -367,45 +375,75 @@ function stripIds(d) {
 
 // ---------------- 印刷 ----------------
 
+function timeSortValue(value) {
+  // 「8:00」「8：00」「19:00〜」など、先頭の時刻を並べ替えに使う。
+  const m = String(value ?? "").trim().match(/^(\d{1,2})\s*[:：]\s*(\d{1,2})/);
+  if (!m) return Number.POSITIVE_INFINITY;
+  const h = Number(m[1]);
+  const min = Number(m[2]);
+  if (h > 23 || min > 59) return Number.POSITIVE_INFINITY;
+  return h * 60 + min;
+}
+
 function buildPrintSheet() {
   const parts = [];
-  parts.push(`
-    <div class="pHead">
-      <span class="pDate ${dayClass(currentDate)}">${esc(fmtDateJa(currentDate))}</span>
-      <span class="pBoxed">起きる</span>
-      ${day.wakeTime.trim() ? `<span class="pTimeBig">${esc(day.wakeTime)}</span>` : ""}
-    </div>`);
+  parts.push(`<div class="pDateOnly ${dayClass(currentDate)}">${esc(fmtDateJa(currentDate))}</div>`);
 
+  // 起床・各項目・お風呂・就寝を1つに集め、時刻順に並べる。
+  const timeline = [];
+  let order = 0;
+  const pushTimeline = (label, text, time, kind = "item") => {
+    const cleanText = String(text ?? "").trim();
+    const cleanTime = String(time ?? "").trim();
+    if (!cleanText && !cleanTime) return;
+    timeline.push({ label, text: cleanText, time: cleanTime, kind, order: order++ });
+  };
+
+  pushTimeline("", "起きる", day.wakeTime, "boxed");
   for (const sec of day.sections) {
-    const items = sec.items.filter((it) => it.text.trim());
-    if (!sec.label.trim() && !sec.note.trim() && items.length === 0) continue;
-    parts.push(`
-    <div class="pSec">
-      <div class="pLabelCol">
-        ${sec.label.trim() ? `<span class="pMagnet">${esc(sec.label)}</span>` : ""}
-        ${sec.note.trim() ? `<div class="pNote">${esc(sec.note)}</div>` : ""}
-      </div>
-      <div class="pItems ${sec.none ? "pDim" : ""}">
-        ${items.map((it) => `
-        <div class="pItem">
-          <span class="pChk"></span>
-          <span class="pText">${esc(it.text)}</span>
-          ${it.time.trim() ? `<span class="pTime">${esc(it.time)}</span>` : ""}
-        </div>`).join("")}
-      </div>
-      ${sec.none ? `<div class="pNone">→ なし</div>` : ""}
-    </div>`);
+    if (sec.none) {
+      if (sec.label.trim() || sec.note.trim()) {
+        pushTimeline(sec.label, `${sec.note.trim() ? `${sec.note.trim()} ` : ""}→ なし`, "", "none");
+      }
+      continue;
+    }
+    for (const it of sec.items) {
+      if (!it.text.trim() && !it.time.trim()) continue;
+      pushTimeline(sec.label, it.text, it.time, "item");
+    }
   }
+  pushTimeline("", "お風呂", day.bathTime, "plain");
+  pushTimeline("", "就寝", day.sleepTime, "boxed");
+
+  timeline.sort((a, b) => {
+    const diff = timeSortValue(a.time) - timeSortValue(b.time);
+    return Number.isNaN(diff) || diff === 0 ? a.order - b.order : diff;
+  });
+
+  parts.push('<div class="pTimeline">');
+  let previousLabel = null;
+  for (const row of timeline) {
+    const showLabel = row.label && row.label !== previousLabel;
+    if (row.label) previousLabel = row.label;
+    else previousLabel = null;
+    parts.push(`
+      <div class="pTimelineRow ${row.kind === "none" ? "pDim" : ""}">
+        <div class="pTimelineLabel">${showLabel ? `<span class="pMagnet">${esc(row.label)}</span>` : ""}</div>
+        <span class="pChk ${row.kind === "boxed" || row.kind === "plain" || row.kind === "none" ? "pChkHidden" : ""}"></span>
+        <span class="pTimelineText ${row.kind === "boxed" ? "pBoxedSmall" : ""}">${esc(row.text)}</span>
+        ${row.time ? `<span class="pTime">${esc(row.time)}</span>` : ""}
+      </div>`);
+  }
+  parts.push('</div>');
 
   parts.push(`
-    <div class="pFoot">
-      <div class="pFootRow"><span>お風呂</span>${day.bathTime.trim() ? `<span>${esc(day.bathTime)}</span>` : ""}</div>
-      <div class="pFootRow"><span class="pBoxed">就寝</span>${day.sleepTime.trim() ? `<span>${esc(day.sleepTime)}</span>` : ""}</div>
+    <div class="pFamilyPlans">
+      <div class="pFamilyPlan"><span class="pFamilyLabel">パパの予定</span><span>${esc(day.papaSchedule).replace(/\n/g, "<br>") || "　"}</span></div>
+      <div class="pFamilyPlan"><span class="pFamilyLabel">ママの予定</span><span>${esc(day.mamaSchedule).replace(/\n/g, "<br>") || "　"}</span></div>
     </div>`);
 
   $("printSheet").innerHTML = parts.join("");
 }
-
 function printDay() {
   flushSave();
   buildPrintSheet();

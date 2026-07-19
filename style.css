@@ -584,3 +584,112 @@ input {
     font-size: 15pt;
   }
 }
+
+/* ---------------- パパ・ママの予定 ---------------- */
+.familyPlans {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.familyPlanRow {
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  align-items: start;
+  gap: 10px;
+  background: var(--board);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 12px 14px;
+}
+
+.familyPlanLabel {
+  font-family: "Yusei Magic", sans-serif;
+  font-size: 16px;
+  padding-top: 8px;
+}
+
+.familyPlanInput {
+  width: 100%;
+  min-height: 58px;
+  resize: vertical;
+  border: 2px dashed var(--line);
+  border-radius: 8px;
+  background: transparent;
+  padding: 8px 10px;
+  font: inherit;
+}
+
+.familyPlanInput:focus {
+  border-color: var(--check);
+  outline: none;
+}
+
+@media print {
+  .pDateOnly {
+    font-size: 25pt;
+    margin: 1mm 0 7mm;
+  }
+
+  .pDateOnly.sun { color: var(--sun); }
+  .pDateOnly.sat { color: var(--sat); }
+
+  .pTimeline {
+    display: flex;
+    flex-direction: column;
+    gap: 3.2mm;
+  }
+
+  .pTimelineRow {
+    display: grid;
+    grid-template-columns: 30mm 6mm minmax(0, 1fr) 24mm;
+    align-items: center;
+    column-gap: 3mm;
+    min-height: 7mm;
+    break-inside: avoid;
+  }
+
+  .pTimelineLabel {
+    min-height: 7mm;
+  }
+
+  .pTimelineText {
+    font-size: 13.5pt;
+  }
+
+  .pBoxedSmall {
+    justify-self: start;
+    border: 0.65mm solid #111;
+    border-radius: 1mm;
+    padding: 0.6mm 2.5mm;
+  }
+
+  .pChkHidden {
+    visibility: hidden;
+  }
+
+  .pFamilyPlans {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5mm;
+    margin-top: 9mm;
+    break-inside: avoid;
+  }
+
+  .pFamilyPlan {
+    min-height: 23mm;
+    border: 0.55mm solid #111;
+    border-radius: 1.5mm;
+    padding: 3mm;
+    font-family: "Zen Maru Gothic", sans-serif;
+    font-size: 10.5pt;
+    line-height: 1.5;
+  }
+
+  .pFamilyLabel {
+    display: block;
+    margin-bottom: 2mm;
+    font-family: "Yusei Magic", sans-serif;
+    font-size: 12pt;
+  }
+}
