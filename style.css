@@ -1,0 +1,586 @@
+/* ============================================================
+   スケジュールボード
+   デザインの軸: 家のホワイトボードそのもの
+   - ボードの白 / マーカーの黒 / マグネットの黄緑
+   - 手書き風フォント(Yusei Magic)を日付・枠・ラベル・印刷に使用
+   ============================================================ */
+
+:root {
+  --bg: #eceada;          /* 壁・トレー */
+  --board: #fdfdf9;       /* ボードの白 */
+  --ink: #1d1d1f;         /* マーカー黒 */
+  --ink-soft: #77776e;
+  --line: #e0dfd2;
+  --magnet: #b9d94f;      /* マグネット黄緑 */
+  --magnet-ink: #2b3a06;
+  --check: #2f6b2f;       /* チェックの緑 */
+  --sun: #c62828;
+  --sat: #1565c0;
+  --radius: 14px;
+  --shadow: 0 1px 2px rgba(35, 35, 20, .08), 0 4px 14px rgba(35, 35, 20, .06);
+}
+
+* { box-sizing: border-box; }
+
+html, body { margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", sans-serif;
+  font-weight: 500;
+  -webkit-font-smoothing: antialiased;
+}
+
+.hidden { display: none !important; }
+
+button {
+  font-family: inherit;
+  font-weight: 700;
+  color: var(--ink);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+input {
+  font-family: inherit;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+:focus-visible {
+  outline: 3px solid rgba(47, 107, 47, .5);
+  outline-offset: 1px;
+}
+
+/* ---------------- ログイン画面 ---------------- */
+
+#loginView {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+}
+
+.loginCard {
+  width: 100%;
+  max-width: 380px;
+  background: var(--board);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 28px 22px;
+}
+
+.loginMagnet {
+  display: inline-block;
+  font-family: "Yusei Magic", sans-serif;
+  font-size: 22px;
+  background: var(--magnet);
+  color: var(--magnet-ink);
+  padding: 8px 14px;
+  border-radius: 6px;
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, .12);
+}
+
+.loginLead {
+  margin: 16px 0 12px;
+  color: var(--ink-soft);
+}
+
+.passInput {
+  width: 100%;
+  min-height: 48px;
+  font-size: 17px;
+  border: 2px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: #fff;
+}
+
+.passInput:focus { border-color: var(--check); outline: none; }
+
+.showPass {
+  display: block;
+  margin: 10px 2px 16px;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.bigBtn {
+  width: 100%;
+  min-height: 50px;
+  font-size: 17px;
+  border: none;
+  border-radius: 12px;
+  background: var(--ink);
+  color: #fff;
+}
+
+.bigBtn.sub {
+  background: var(--magnet);
+  color: var(--magnet-ink);
+  margin-top: 10px;
+}
+
+.errMsg {
+  color: var(--sun);
+  font-size: 13px;
+  min-height: 1.2em;
+  margin: 10px 0 0;
+}
+
+.setupBox {
+  margin-top: 22px;
+  border-top: 1px dashed var(--line);
+  padding-top: 14px;
+  font-size: 14px;
+}
+
+.setupBox summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+.setupBox p { color: var(--ink-soft); }
+
+/* ---------------- メイン画面 ---------------- */
+
+#appView {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  max-width: 620px;
+  margin: 0 auto;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 12px calc(10px);
+  background: var(--board);
+  border-bottom: 2px solid var(--line);
+}
+
+.navBtn {
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  font-size: 15px;
+  color: var(--ink-soft);
+}
+
+.navBtn:active { background: var(--bg); }
+
+.dateWrap {
+  position: relative;
+  padding: 2px 6px;
+}
+
+.dateLabel {
+  font-family: "Yusei Magic", sans-serif;
+  font-size: 26px;
+  letter-spacing: .02em;
+}
+
+.dateLabel.sun { color: var(--sun); }
+.dateLabel.sat { color: var(--sat); }
+
+.dateInput {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  border: 0;
+  padding: 0;
+}
+
+.spacer { flex: 1; }
+
+.printBtn {
+  min-height: 42px;
+  padding: 0 14px;
+  border: 2.5px solid var(--ink);
+  border-radius: 8px;
+  background: var(--board);
+  font-family: "Yusei Magic", sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+}
+
+.board {
+  flex: 1;
+  padding: 14px 14px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* 起きる・お風呂・就寝 の行 */
+.dayRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--board);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 12px 14px;
+}
+
+.boxed {
+  font-family: "Yusei Magic", sans-serif;
+  font-size: 18px;
+  border: 2.5px solid var(--ink);
+  border-radius: 4px;
+  padding: 4px 10px;
+  white-space: nowrap;
+}
+
+.plainLabel {
+  font-family: "Yusei Magic", sans-serif;
+  font-size: 18px;
+  padding: 4px 2px;
+  white-space: nowrap;
+}
+
+.timeInput {
+  width: 110px;
+  min-height: 44px;
+  font-size: 17px;
+  border: none;
+  border-bottom: 2px dashed var(--line);
+  border-radius: 0;
+  background: transparent;
+  padding: 4px 6px;
+}
+
+.timeInput:focus { border-bottom-color: var(--check); outline: none; }
+
+/* セクション(マグネット付きカード) */
+.sec {
+  background: var(--board);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 12px 12px 10px;
+}
+
+.secHead {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.secLabel {
+  flex: 1;
+  min-width: 0;
+  min-height: 40px;
+  font-family: "Yusei Magic", sans-serif;
+  font-size: 17px;
+  border: none;
+  background: transparent;
+  border-bottom: 2px dashed var(--line);
+  padding: 4px 6px;
+}
+
+.secLabel.hasLabel {
+  flex: 0 1 auto;
+  width: 7em;
+  background: var(--magnet);
+  color: var(--magnet-ink);
+  border: none;
+  border-radius: 6px;
+  padding: 6px 10px;
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, .12);
+}
+
+.secLabel:focus { outline: none; border-bottom-color: var(--check); }
+.secLabel.hasLabel:focus { outline: 3px solid rgba(47, 107, 47, .5); }
+
+.iconBtn {
+  width: 34px;
+  height: 34px;
+  flex: none;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink-soft);
+  font-size: 14px;
+  line-height: 1;
+}
+
+.iconBtn:active { background: var(--bg); }
+
+.chip {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 2px solid var(--line);
+  border-radius: 999px;
+  background: var(--board);
+  font-size: 14px;
+}
+
+.chip.green {
+  border-color: transparent;
+  background: var(--magnet);
+  color: var(--magnet-ink);
+}
+
+.chip.on {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: #fff;
+}
+
+.secNote {
+  width: 100%;
+  min-height: 32px;
+  font-size: 13px;
+  color: var(--ink-soft);
+  border: none;
+  background: transparent;
+  padding: 2px 6px;
+  margin-top: 4px;
+}
+
+.secNote::placeholder { color: #b9b8ab; }
+
+.items { margin-top: 4px; }
+
+.items.isNone { opacity: .45; }
+
+.item {
+  display: grid;
+  grid-template-columns: 30px 1fr 84px auto;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 0;
+}
+
+.item input[type="checkbox"] {
+  width: 24px;
+  height: 24px;
+  accent-color: var(--check);
+  margin: 0 auto;
+}
+
+.itText {
+  min-width: 0;
+  min-height: 42px;
+  font-size: 16px;
+  border: none;
+  border-bottom: 2px dashed transparent;
+  background: transparent;
+  padding: 4px 6px;
+}
+
+.itText:focus, .itTime:focus { border-bottom-color: var(--check); outline: none; }
+
+.itText::placeholder { color: #c4c3b6; }
+
+.item.done .itText {
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+  color: var(--ink-soft);
+}
+
+.itTime {
+  min-height: 42px;
+  font-size: 14px;
+  border: none;
+  border-bottom: 2px dashed transparent;
+  background: transparent;
+  padding: 4px 4px;
+  text-align: right;
+}
+
+.itTime::placeholder { color: #c4c3b6; }
+
+.itBtns { display: flex; gap: 2px; }
+
+.itBtns .iconBtn { width: 28px; height: 34px; font-size: 12px; }
+
+.noneBadge {
+  font-family: "Yusei Magic", sans-serif;
+  font-size: 17px;
+  margin: 4px 6px;
+}
+
+.addItem {
+  width: 100%;
+  min-height: 40px;
+  margin-top: 6px;
+  border: 2px dashed var(--line);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ink-soft);
+  font-size: 14px;
+}
+
+.addRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 4px;
+}
+
+.addRowLabel { font-size: 13px; color: var(--ink-soft); }
+
+.copyRow { padding: 0 4px; }
+
+.textBtn {
+  border: none;
+  background: transparent;
+  color: var(--ink-soft);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-size: 14px;
+  min-height: 40px;
+  padding: 4px 6px;
+}
+
+.textBtn.small { font-size: 12px; }
+
+.bottombar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 18px calc(14px + env(safe-area-inset-bottom));
+}
+
+.syncStatus {
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .item .itText { transition: color .15s ease; }
+}
+
+/* Yusei Magic は 400 のみ提供のため、擬似ボールドを避ける */
+.dateLabel, .boxed, .plainLabel, .secLabel, .loginMagnet, .noneBadge, .printBtn,
+#printSheet {
+  font-weight: 400;
+}
+
+/* ============================================================
+   印刷(B5・JIS 182×257mm)— ホワイトボード風に出力
+   ============================================================ */
+
+#printSheet { display: none; }
+
+@media print {
+  @page {
+    size: 182mm 257mm; /* JIS B5 */
+    margin: 11mm;
+  }
+
+  body { background: #fff; }
+
+  #appView, #loginView { display: none !important; }
+
+  #printSheet {
+    display: block;
+    font-family: "Yusei Magic", "Zen Maru Gothic", sans-serif;
+    color: #111;
+  }
+
+  .pHead {
+    display: flex;
+    align-items: center;
+    gap: 7mm;
+    margin: 2mm 0 9mm;
+  }
+
+  .pDate { font-size: 25pt; }
+  .pDate.sun { color: var(--sun); }
+  .pDate.sat { color: var(--sat); }
+
+  .pBoxed {
+    display: inline-block;
+    border: 0.8mm solid #111;
+    border-radius: 1mm;
+    padding: 1mm 4mm;
+    font-size: 15pt;
+  }
+
+  .pTimeBig { font-size: 15pt; }
+
+  .pSec {
+    display: flex;
+    align-items: flex-start;
+    gap: 5mm;
+    margin: 0 0 7mm;
+    break-inside: avoid;
+  }
+
+  .pLabelCol { width: 32mm; flex: none; padding-top: 1mm; }
+
+  .pMagnet {
+    display: inline-block;
+    background: var(--magnet);
+    color: #21300a;
+    border-radius: 1.5mm;
+    padding: 1.5mm 3mm;
+    font-size: 13pt;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .pNote { font-size: 9.5pt; margin-top: 1.5mm; }
+
+  .pItems { flex: 1; min-width: 0; }
+
+  .pItem {
+    display: flex;
+    align-items: center;
+    gap: 3.5mm;
+    margin: 0 0 3.5mm;
+    font-size: 14pt;
+  }
+
+  .pChk {
+    width: 5.5mm;
+    height: 5.5mm;
+    flex: none;
+    border: 0.55mm solid #111;
+    border-radius: 0.8mm;
+  }
+
+  .pText { flex: 1; min-width: 0; }
+
+  .pTime { font-size: 12pt; white-space: nowrap; }
+
+  .pNone {
+    align-self: center;
+    font-size: 15pt;
+    white-space: nowrap;
+    padding-left: 2mm;
+  }
+
+  .pItems.pDim { opacity: .5; }
+
+  .pFoot {
+    margin-top: 12mm;
+    padding-left: 37mm;
+    display: flex;
+    flex-direction: column;
+    gap: 6mm;
+    align-items: flex-start;
+  }
+
+  .pFootRow {
+    display: flex;
+    align-items: center;
+    gap: 6mm;
+    font-size: 15pt;
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "スケジュールボード",
+  "short_name": "スケジュール",
+  "description": "家族で書きこめる、きょうの予定ボード",
+  "lang": "ja",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#eceada",
+  "theme_color": "#b9d94f",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

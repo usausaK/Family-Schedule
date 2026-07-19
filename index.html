@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>スケジュールボード</title>
+  <meta name="theme-color" content="#b9d94f">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon-192.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Yusei+Magic&family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ログイン画面 -->
+  <div id="loginView" class="view hidden">
+    <div class="loginCard">
+      <div class="loginMagnet">スケジュールボード</div>
+      <p class="loginLead">家族の合言葉を入れてはじめる</p>
+      <input id="loginPass" type="password" class="passInput" placeholder="合言葉" autocomplete="current-password" enterkeyhint="go">
+      <label class="showPass"><input id="loginShow" type="checkbox"> 合言葉を表示する</label>
+      <button id="loginBtn" class="bigBtn">ログイン</button>
+      <p id="loginError" class="errMsg" role="alert"></p>
+
+      <details class="setupBox">
+        <summary>初回セットアップ(最初に一度だけ)</summary>
+        <p>家族で決めた合言葉をここで登録します。登録後は、家族全員が同じ合言葉でログインできます。</p>
+        <input id="setupPass" type="password" class="passInput" placeholder="決めた合言葉(6文字以上)" autocomplete="new-password">
+        <button id="setupBtn" class="bigBtn sub">この合言葉で登録する</button>
+        <p id="setupError" class="errMsg" role="alert"></p>
+      </details>
+    </div>
+  </div>
+
+  <!-- メイン画面 -->
+  <div id="appView" class="view hidden">
+    <header class="topbar">
+      <button id="prevDay" class="navBtn" aria-label="前の日">◀</button>
+      <div class="dateWrap">
+        <span id="dateLabel" class="dateLabel">--/--</span>
+        <input id="dateInput" type="date" class="dateInput" aria-label="日付を選ぶ">
+      </div>
+      <button id="nextDay" class="navBtn" aria-label="次の日">▶</button>
+      <span class="spacer"></span>
+      <button id="printBtn" class="printBtn">B5印刷</button>
+    </header>
+
+    <main class="board">
+      <div class="dayRow">
+        <span class="boxed">起きる</span>
+        <input class="timeInput" data-k="wakeTime" placeholder="7:00" inputmode="text">
+      </div>
+
+      <div id="sections"></div>
+
+      <div class="addRow">
+        <span class="addRowLabel">追加:</span>
+        <button class="chip" data-act="addSec" data-label="">やること</button>
+        <button class="chip green" data-act="addSec" data-label="算数">算数</button>
+        <button class="chip green" data-act="addSec" data-label="国語">国語</button>
+        <button class="chip green" data-act="addSec" data-label="英語">英語</button>
+        <button class="chip green" data-act="addSec" data-label="理科">理科</button>
+        <button class="chip green" data-act="addSec" data-label="社会">社会</button>
+      </div>
+      <div class="copyRow">
+        <button id="copyPrev" class="textBtn">前の日の内容をコピー</button>
+      </div>
+
+      <div class="dayRow">
+        <span class="plainLabel">お風呂</span>
+        <input class="timeInput" data-k="bathTime" placeholder="21:30" inputmode="text">
+      </div>
+      <div class="dayRow">
+        <span class="boxed">就寝</span>
+        <input class="timeInput" data-k="sleepTime" placeholder="22:30" inputmode="text">
+      </div>
+    </main>
+
+    <footer class="bottombar">
+      <span id="syncStatus" class="syncStatus"></span>
+      <button id="logoutBtn" class="textBtn small">ログアウト</button>
+    </footer>
+  </div>
+
+  <!-- 印刷用シート(画面には出ない・B5) -->
+  <div id="printSheet" aria-hidden="true"></div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
