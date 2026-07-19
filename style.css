@@ -471,120 +471,6 @@ input {
   font-weight: 400;
 }
 
-/* ============================================================
-   印刷(B5・JIS 182×257mm)— ホワイトボード風に出力
-   ============================================================ */
-
-#printSheet { display: none; }
-
-@media print {
-  @page {
-    size: 182mm 257mm; /* JIS B5 */
-    margin: 11mm;
-  }
-
-  body { background: #fff; }
-
-  #appView, #loginView { display: none !important; }
-
-  #printSheet {
-    display: block;
-    font-family: "Yusei Magic", "Zen Maru Gothic", sans-serif;
-    color: #111;
-  }
-
-  .pHead {
-    display: flex;
-    align-items: center;
-    gap: 7mm;
-    margin: 2mm 0 9mm;
-  }
-
-  .pDate { font-size: 25pt; }
-  .pDate.sun { color: var(--sun); }
-  .pDate.sat { color: var(--sat); }
-
-  .pBoxed {
-    display: inline-block;
-    border: 0.8mm solid #111;
-    border-radius: 1mm;
-    padding: 1mm 4mm;
-    font-size: 15pt;
-  }
-
-  .pTimeBig { font-size: 15pt; }
-
-  .pSec {
-    display: flex;
-    align-items: flex-start;
-    gap: 5mm;
-    margin: 0 0 7mm;
-    break-inside: avoid;
-  }
-
-  .pLabelCol { width: 32mm; flex: none; padding-top: 1mm; }
-
-  .pMagnet {
-    display: inline-block;
-    background: var(--magnet);
-    color: #21300a;
-    border-radius: 1.5mm;
-    padding: 1.5mm 3mm;
-    font-size: 13pt;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
-
-  .pNote { font-size: 9.5pt; margin-top: 1.5mm; }
-
-  .pItems { flex: 1; min-width: 0; }
-
-  .pItem {
-    display: flex;
-    align-items: center;
-    gap: 3.5mm;
-    margin: 0 0 3.5mm;
-    font-size: 14pt;
-  }
-
-  .pChk {
-    width: 5.5mm;
-    height: 5.5mm;
-    flex: none;
-    border: 0.55mm solid #111;
-    border-radius: 0.8mm;
-  }
-
-  .pText { flex: 1; min-width: 0; }
-
-  .pTime { font-size: 12pt; white-space: nowrap; }
-
-  .pNone {
-    align-self: center;
-    font-size: 15pt;
-    white-space: nowrap;
-    padding-left: 2mm;
-  }
-
-  .pItems.pDim { opacity: .5; }
-
-  .pFoot {
-    margin-top: 12mm;
-    padding-left: 37mm;
-    display: flex;
-    flex-direction: column;
-    gap: 6mm;
-    align-items: flex-start;
-  }
-
-  .pFootRow {
-    display: flex;
-    align-items: center;
-    gap: 6mm;
-    font-size: 15pt;
-  }
-}
-
 /* ---------------- パパ・ママの予定 ---------------- */
 .familyPlans {
   display: flex;
@@ -625,71 +511,175 @@ input {
   outline: none;
 }
 
+/* ============================================================
+   印刷(B5・JIS 182×257mm)
+   - 時刻順
+   - daily項目は左寄せ、教科ラベルはチェック欄の直前
+   - 淡い色と細い線で、インク消費を抑えながら明るい印象
+   ============================================================ */
+#printSheet { display: none; }
+
 @media print {
-  .pDateOnly {
-    font-size: 25pt;
-    margin: 1mm 0 7mm;
+  @page {
+    size: 182mm 257mm;
+    margin: 9mm 10mm;
   }
 
-  .pDateOnly.sun { color: var(--sun); }
-  .pDateOnly.sat { color: var(--sat); }
+  html, body {
+    width: 182mm;
+    margin: 0;
+    padding: 0;
+    background: #fff;
+  }
+
+  #appView, #loginView { display: none !important; }
+
+  #printSheet {
+    display: block;
+    width: 162mm;
+    max-width: 162mm;
+    font-family: "Yusei Magic", "Zen Maru Gothic", "Hiragino Maru Gothic ProN", sans-serif;
+    color: #151515;
+    font-weight: 400;
+  }
+
+  .pDateOnly {
+    font-size: 22pt;
+    line-height: 1;
+    margin: 1mm 0 5mm;
+    padding-bottom: 2mm;
+    border-bottom: 0.6mm solid #a8c944;
+    width: fit-content;
+  }
+
+  .pDateOnly.sun { color: #c83b32; }
+  .pDateOnly.sat { color: #2567a6; }
 
   .pTimeline {
+    width: 125mm;
     display: flex;
     flex-direction: column;
-    gap: 3.2mm;
+    gap: 1.5mm;
   }
 
+  /* 時刻｜ラベル（または生活項目）｜チェック｜内容 */
   .pTimelineRow {
+    width: 125mm;
     display: grid;
-    grid-template-columns: 30mm 6mm minmax(0, 1fr) 24mm;
+    grid-template-columns: 17mm 18mm 5mm 79mm;
+    column-gap: 2mm;
     align-items: center;
-    column-gap: 3mm;
-    min-height: 7mm;
+    min-height: 6mm;
     break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .pTime {
+    grid-column: 1;
+    font-size: 10pt;
+    line-height: 1;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .pDailyRow .pDailyMarker {
+    grid-column: 2;
+    justify-self: start;
   }
 
   .pTimelineLabel {
-    min-height: 7mm;
+    grid-column: 2;
+    width: 18mm;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
   }
+
+  .pChk {
+    grid-column: 3;
+    width: 4.4mm;
+    height: 4.4mm;
+    border: 0.4mm solid #55775f;
+    border-radius: 0.6mm;
+    background: #fff;
+  }
+
+  .pChkHidden { visibility: hidden; }
 
   .pTimelineText {
-    font-size: 13.5pt;
+    grid-column: 4;
+    min-width: 0;
+    font-size: 12pt;
+    line-height: 1.12;
+    white-space: normal;
+    overflow-wrap: break-word;
   }
 
-  .pBoxedSmall {
-    justify-self: start;
-    border: 0.65mm solid #111;
-    border-radius: 1mm;
-    padding: 0.6mm 2.5mm;
+  .pNoneRow .pTimelineText { color: #555; }
+
+  .pMagnet {
+    display: inline-block;
+    min-width: 12mm;
+    max-width: 18mm;
+    padding: 0.7mm 1.2mm;
+    border: 0.3mm solid #8eae33;
+    border-radius: 1.3mm;
+    background: #f3f8df;
+    color: #344609;
+    font-size: 10.5pt;
+    line-height: 1.05;
+    text-align: center;
+    white-space: nowrap;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 
-  .pChkHidden {
-    visibility: hidden;
+  .pDailyMarker {
+    display: inline-block;
+    padding: 0.6mm 2.1mm;
+    border: 0.4mm solid #555;
+    border-radius: 1.3mm;
+    background: #fff;
+    font-size: 11pt;
+    line-height: 1.1;
+    white-space: nowrap;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
+
+  .pWake  { border-color: #d49a29; color: #76510c; }
+  .pMeal  { border-color: #d67972; color: #7a3934; border-radius: 999px; }
+  .pBath  { border-color: #4f83b3; color: #28577f; }
+  .pSleep { border-color: #8067ae; color: #514071; }
 
   .pFamilyPlans {
+    width: 162mm;
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 5mm;
-    margin-top: 9mm;
+    margin-top: 6mm;
     break-inside: avoid;
+    page-break-inside: avoid;
   }
 
   .pFamilyPlan {
-    min-height: 23mm;
-    border: 0.55mm solid #111;
-    border-radius: 1.5mm;
-    padding: 3mm;
-    font-family: "Zen Maru Gothic", sans-serif;
-    font-size: 10.5pt;
-    line-height: 1.5;
+    min-height: 19mm;
+    border: 0.4mm solid #555;
+    border-radius: 1.4mm;
+    padding: 2.5mm;
+    font-family: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", sans-serif;
+    font-size: 9.5pt;
+    line-height: 1.35;
+    background: #fff;
   }
+
+  .pMamaPlan { border-top: 1mm solid #8fbfd8; }
+  .pPapaPlan { border-top: 1mm solid #e6bd67; }
 
   .pFamilyLabel {
     display: block;
-    margin-bottom: 2mm;
+    margin-bottom: 1.3mm;
     font-family: "Yusei Magic", sans-serif;
-    font-size: 12pt;
+    font-size: 11pt;
   }
 }
