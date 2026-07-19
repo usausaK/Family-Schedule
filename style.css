@@ -511,6 +511,88 @@ input {
   outline: none;
 }
 
+
+.nextTestRow,
+.submissionRow {
+  display: grid;
+  grid-template-columns: 108px minmax(112px, .65fr) 1.35fr;
+  align-items: center;
+  gap: 10px;
+  background: #fffdf4;
+  border: 2px solid #ead89b;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 11px 14px;
+}
+
+.submissionRow {
+  background: #f7fbff;
+  border-color: #b9d6e8;
+}
+
+.nextTestLabel,
+.submissionLabel {
+  font-family: "Yusei Magic", sans-serif;
+  font-size: 16px;
+  white-space: nowrap;
+}
+
+.dateWithWeekday {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  border-bottom: 2px dashed #d7bf6b;
+}
+
+.submissionRow .dateWithWeekday { border-bottom-color: #8db9d4; }
+
+.nextTestDateInput, .submissionDateInput,
+.nextTestNameInput, .submissionHourInput {
+  min-height: 44px;
+  border: none;
+  background: transparent;
+  padding: 6px 8px;
+  font-size: 16px;
+  min-width: 0;
+}
+
+.nextTestDateInput, .submissionDateInput { width: 82px; }
+.nextTestNameInput {
+  width: 100%;
+  border-bottom: 2px dashed #d7bf6b;
+}
+
+.weekdayHint {
+  flex: none;
+  min-width: 2.4em;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+.submissionTimeWrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border-bottom: 2px dashed #8db9d4;
+  white-space: nowrap;
+}
+
+.submissionHourInput { width: 78px; text-align: right; }
+
+.nextTestDateInput:focus, .submissionDateInput:focus,
+.nextTestNameInput:focus, .submissionHourInput:focus {
+  outline: none;
+}
+
+@media (max-width: 520px) {
+  .nextTestRow, .submissionRow {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  .dateWithWeekday, .nextTestNameInput, .submissionTimeWrap { width: 100%; }
+  .submissionHourInput { text-align: left; }
+}
+
 /* ============================================================
    印刷（A4・210×297mm）
    - 文字を大きくしても1ページに収まる設計
@@ -685,4 +767,48 @@ input {
     font-family: "Yusei Magic", sans-serif;
     font-size: 16pt;
   }
+
+  .pNextTest,
+  .pSubmission {
+    grid-column: 1 / -1;
+    min-height: 13mm;
+    display: flex;
+    align-items: center;
+    gap: 4mm;
+    border: 0.5mm solid #b99a3f;
+    border-radius: 1.8mm;
+    padding: 2.5mm 3.5mm;
+    background: #fffdf4;
+    font-family: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", sans-serif;
+    break-inside: avoid;
+    page-break-inside: avoid;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .pNextTestLead,
+  .pSubmissionLead {
+    flex: none;
+    font-family: "Yusei Magic", sans-serif;
+    font-size: 16pt;
+    white-space: nowrap;
+  }
+
+  .pNextTestValue,
+  .pSubmissionValue {
+    flex: 1;
+    min-width: 0;
+    border-bottom: 0.45mm solid #7a6a35;
+    padding: 0.5mm 2mm 1mm;
+    font-size: 17pt;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+  }
+
+  .pSubmission {
+    border-color: #6f9fbc;
+    background: #f7fbff;
+  }
+
+
 }

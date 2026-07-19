@@ -89,6 +89,10 @@ function emptyDay(dateStr) {
     sleepTime: "",
     papaSchedule: "",
     mamaSchedule: "",
+    nextTestDate: "",
+    nextTestName: "",
+    submissionDate: "",
+    submissionHour: "",
     sections: DAY_TEMPLATE.map((t) => ({
       id: newId(), label: t.label, note: "", none: false,
       items: t.items.map((text) => ({ id: newId(), text: text, time: "", done: false }))
@@ -105,6 +109,10 @@ function normalize(data, dateStr) {
     sleepTime: String(d.sleepTime ?? ""),
     papaSchedule: String(d.papaSchedule ?? ""),
     mamaSchedule: String(d.mamaSchedule ?? ""),
+    nextTestDate: String(d.nextTestDate ?? ""),
+    nextTestName: String(d.nextTestName ?? d.nextTest ?? ""),
+    submissionDate: String(d.submissionDate ?? ""),
+    submissionHour: String(d.submissionHour ?? ""),
     sections: Array.isArray(d.sections) ? d.sections.map((s) => ({
       id: String(s.id ?? newId()),
       label: String(s.label ?? ""),
@@ -228,6 +236,11 @@ function render() {
   setIfNotFocused('[data-k="sleepTime"]', day.sleepTime);
   setIfNotFocused('[data-k="papaSchedule"]', day.papaSchedule);
   setIfNotFocused('[data-k="mamaSchedule"]', day.mamaSchedule);
+  setIfNotFocused('[data-k="nextTestDate"]', day.nextTestDate);
+  setIfNotFocused('[data-k="nextTestName"]', day.nextTestName);
+  setIfNotFocused('[data-k="submissionDate"]', day.submissionDate);
+  setIfNotFocused('[data-k="submissionHour"]', day.submissionHour);
+  updateDateWeekdayHints();
 
   $("sections").innerHTML = day.sections.map(secHTML).join("");
 }
@@ -272,6 +285,7 @@ function handleInput(ev) {
     if (!it) return;
     it[p[3]] = v;
   }
+  if (k === "nextTestDate" || k === "submissionDate") updateDateWeekdayHints();
   scheduleSave();
 }
 
@@ -353,6 +367,10 @@ async function copyPrev() {
         sleepTime: prev.sleepTime,
         papaSchedule: prev.papaSchedule,
         mamaSchedule: prev.mamaSchedule,
+        nextTestDate: prev.nextTestDate,
+        nextTestName: prev.nextTestName,
+        submissionDate: prev.submissionDate,
+        submissionHour: prev.submissionHour,
         sections: prev.sections.map((s) => ({
           id: newId(), label: s.label, note: s.note, none: false,
           items: s.items.map((it) => ({ id: newId(), text: it.text, time: it.time, done: false }))
@@ -383,6 +401,47 @@ function timeSortValue(value) {
   const min = Number(m[2]);
   if (h > 23 || min > 59) return Number.POSITIVE_INFINITY;
   return h * 60 + min;
+}
+
+function formatMonthDayWithWeekday(value) {
+  const raw = String(value ?? "").trim();
+  const m = raw.match(/^(\d{1,2})\s*[\/／.-]\s*(\d{1,2})$/);
+  if (!m) return raw;
+  const month = Number(m[1]);
+  const date = Number(m[2]);
+  if (month < 1 || month > 12 || date < 1 || date > 31) return raw;
+
+  const base = parseDate(currentDate);
+  let year = base.getFullYear();
+  let d = new Date(year, month - 1, date);
+  if (d.getMonth() !== month - 1 || d.getDate() !== date) return raw;
+  // 「次の」日付として、選択日より半年以上前なら翌年とみなす。
+  if ((d - base) < -183 * 24 * 60 * 60 * 1000) {
+    year += 1;
+    d = new Date(year, month - 1, date);
+  }
+  return `${month}/${date}（${WD[d.getDay()]}）`;
+}
+
+function updateDateWeekdayHints() {
+  const testEl = $("nextTestWeekday");
+  const submitEl = $("submissionWeekday");
+  if (testEl) {
+    const formatted = formatMonthDayWithWeekday(day.nextTestDate);
+    testEl.textContent = formatted && formatted !== String(day.nextTestDate ?? "").trim()
+      ? formatted.replace(/^.*（/, "（")
+      : "";
+  }
+  if (submitEl) {
+    const formatted = formatMonthDayWithWeekday(day.submissionDate);
+    submitEl.textContent = formatted && formatted !== String(day.submissionDate ?? "").trim()
+      ? formatted.replace(/^.*（/, "（")
+      : "";
+  }
+}
+
+function cleanSubmissionHour(value) {
+  return String(value ?? "").trim().replace(/時まで$/, "").replace(/時$/, "").trim();
 }
 
 function dailyPrintClass(text) {
@@ -468,6 +527,8 @@ function buildPrintSheet() {
     <div class="pFamilyPlans">
       <div class="pFamilyPlan pMamaPlan"><span class="pFamilyLabel">ママの予定</span><span>${esc(day.mamaSchedule).replace(/\n/g, "<br>") || "　"}</span></div>
       <div class="pFamilyPlan pPapaPlan"><span class="pFamilyLabel">パパの予定</span><span>${esc(day.papaSchedule).replace(/\n/g, "<br>") || "　"}</span></div>
+      <div class="pNextTest"><span class="pNextTestLead">次のテストは</span><span class="pNextTestValue">${esc([formatMonthDayWithWeekday(day.nextTestDate), day.nextTestName].filter(Boolean).join(" ")) || "　　　　　　　　　"}</span></div>
+      <div class="pSubmission"><span class="pSubmissionLead">提出予定日</span><span class="pSubmissionValue">${esc(formatMonthDayWithWeekday(day.submissionDate)) || "　　　　"}${cleanSubmissionHour(day.submissionHour) ? `　${esc(cleanSubmissionHour(day.submissionHour))}時まで` : ""}</span></div>
     </div>`);
 
   $("printSheet").innerHTML = parts.join("");
@@ -476,14 +537,23 @@ function printDay() {
   flushSave();
   buildPrintSheet();
 
-  // iPhone版Safariでは、印刷用DOMを作った直後にwindow.print()を呼ぶと、
-  // レイアウト反映前のため印刷画面が開かなかったり、空白になることがある。
-  // 2フレーム待ってから印刷処理を開始する。
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      window.print();
-    });
-  });
+  // iPhone/iPadのSafariは、タップ操作から時間を空けてwindow.print()を
+  // 呼ぶとユーザー操作として認識されず、印刷画面が開かない場合がある。
+  // 印刷DOMを同期的に作成し、強制レイアウト後すぐに印刷を呼び出す。
+  const printSheet = $("printSheet");
+  void printSheet.offsetHeight;
+
+  const ua = navigator.userAgent;
+  const isIOS = /iP(hone|ad|od)/.test(ua) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  const isSafari = /Safari/.test(ua) && !/(CriOS|FxiOS|EdgiOS|OPiOS)/.test(ua);
+
+  if (isIOS && isSafari) {
+    window.print();
+    return;
+  }
+
+  requestAnimationFrame(() => window.print());
 }
 
 // Safariの共有メニューなど別経路から印刷された場合にも、

@@ -45,7 +45,7 @@
       </div>
       <button id="nextDay" class="navBtn" aria-label="次の日">▶</button>
       <span class="spacer"></span>
-      <button id="printBtn" class="printBtn">B5印刷</button>
+      <button id="printBtn" class="printBtn">印刷</button>
     </header>
 
     <main class="board">
@@ -78,6 +78,25 @@
           <span class="familyPlanLabel">パパの予定</span>
           <textarea class="familyPlanInput" data-k="papaSchedule" placeholder="出社、帰宅予定、送迎など"></textarea>
         </label>
+        <div class="nextTestRow">
+          <span class="nextTestLabel">次のテストは</span>
+          <div class="dateWithWeekday">
+            <input class="nextTestDateInput" data-k="nextTestDate" placeholder="例：8/20" inputmode="text" aria-label="次のテストの日付">
+            <span id="nextTestWeekday" class="weekdayHint" aria-live="polite"></span>
+          </div>
+          <input class="nextTestNameInput" data-k="nextTestName" placeholder="例：漢字テスト" inputmode="text" aria-label="テスト名">
+        </div>
+        <div class="submissionRow">
+          <span class="submissionLabel">提出予定日</span>
+          <div class="dateWithWeekday">
+            <input class="submissionDateInput" data-k="submissionDate" placeholder="例：8/22" inputmode="text" aria-label="提出予定日">
+            <span id="submissionWeekday" class="weekdayHint" aria-live="polite"></span>
+          </div>
+          <div class="submissionTimeWrap">
+            <input class="submissionHourInput" data-k="submissionHour" placeholder="例：17" inputmode="text" aria-label="提出時刻">
+            <span>時まで</span>
+          </div>
+        </div>
       </section>
 
       <div class="dayRow">
