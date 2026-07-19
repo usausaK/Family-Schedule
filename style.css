@@ -768,17 +768,15 @@ input {
     font-size: 16pt;
   }
 
-  .pNextTest,
-  .pSubmission {
+  .pTestDeadlineBox {
     grid-column: 1 / -1;
-    min-height: 13mm;
     display: flex;
-    align-items: center;
-    gap: 4mm;
-    border: 0.5mm solid #b99a3f;
+    flex-direction: column;
+    gap: 1.5mm;
+    border: 0.5mm solid #8f9b72;
     border-radius: 1.8mm;
-    padding: 2.5mm 3.5mm;
-    background: #fffdf4;
+    padding: 2.4mm 3.5mm;
+    background: #fffef8;
     font-family: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", sans-serif;
     break-inside: avoid;
     page-break-inside: avoid;
@@ -786,11 +784,21 @@ input {
     print-color-adjust: exact;
   }
 
+  .pNextTest,
+  .pSubmission {
+    min-height: 8.5mm;
+    display: flex;
+    align-items: center;
+    gap: 3mm;
+  }
+
   .pNextTestLead,
   .pSubmissionLead {
     flex: none;
+    width: 29mm;
     font-family: "Yusei Magic", sans-serif;
-    font-size: 16pt;
+    font-size: 14pt;
+    line-height: 1.15;
     white-space: nowrap;
   }
 
@@ -798,16 +806,16 @@ input {
   .pSubmissionValue {
     flex: 1;
     min-width: 0;
-    border-bottom: 0.45mm solid #7a6a35;
-    padding: 0.5mm 2mm 1mm;
-    font-size: 17pt;
-    line-height: 1.2;
+    border-bottom: 0.4mm solid #7a765f;
+    padding: 0.3mm 1.5mm 0.7mm;
+    font-size: 15pt;
+    line-height: 1.15;
     overflow-wrap: anywhere;
   }
 
   .pSubmission {
-    border-color: #6f9fbc;
-    background: #f7fbff;
+    padding-top: 1.2mm;
+    border-top: 0.3mm dashed #c7c3ad;
   }
 
 

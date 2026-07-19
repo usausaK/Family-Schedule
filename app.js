@@ -527,8 +527,10 @@ function buildPrintSheet() {
     <div class="pFamilyPlans">
       <div class="pFamilyPlan pMamaPlan"><span class="pFamilyLabel">ママの予定</span><span>${esc(day.mamaSchedule).replace(/\n/g, "<br>") || "　"}</span></div>
       <div class="pFamilyPlan pPapaPlan"><span class="pFamilyLabel">パパの予定</span><span>${esc(day.papaSchedule).replace(/\n/g, "<br>") || "　"}</span></div>
-      <div class="pNextTest"><span class="pNextTestLead">次のテストは</span><span class="pNextTestValue">${esc([formatMonthDayWithWeekday(day.nextTestDate), day.nextTestName].filter(Boolean).join(" ")) || "　　　　　　　　　"}</span></div>
-      <div class="pSubmission"><span class="pSubmissionLead">提出予定日</span><span class="pSubmissionValue">${esc(formatMonthDayWithWeekday(day.submissionDate)) || "　　　　"}${cleanSubmissionHour(day.submissionHour) ? `　${esc(cleanSubmissionHour(day.submissionHour))}時まで` : ""}</span></div>
+      <div class="pTestDeadlineBox">
+        <div class="pNextTest"><span class="pNextTestLead">次のテストは</span><span class="pNextTestValue">${esc([formatMonthDayWithWeekday(day.nextTestDate), day.nextTestName].filter(Boolean).join(" ")) || "　　　　　　　　　"}</span></div>
+        <div class="pSubmission"><span class="pSubmissionLead">提出期限</span><span class="pSubmissionValue">${esc(formatMonthDayWithWeekday(day.submissionDate)) || "　　　　"}${cleanSubmissionHour(day.submissionHour) ? `　${esc(cleanSubmissionHour(day.submissionHour))}時まで` : ""}</span></div>
+      </div>
     </div>`);
 
   $("printSheet").innerHTML = parts.join("");
