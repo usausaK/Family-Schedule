@@ -399,7 +399,7 @@ function buildPrintSheet() {
     timeline.push({ label, text: cleanText, time: cleanTime, kind, order: order++ });
   };
 
-  pushTimeline("", "起きる", day.wakeTime, "boxed");
+  pushTimeline("", "起きる", day.wakeTime, "daily");
   for (const sec of day.sections) {
     if (sec.none) {
       if (sec.label.trim() || sec.note.trim()) {
@@ -409,11 +409,12 @@ function buildPrintSheet() {
     }
     for (const it of sec.items) {
       if (!it.text.trim() && !it.time.trim()) continue;
-      pushTimeline(sec.label, it.text, it.time, "item");
+      const meal = ["朝食", "昼食", "夕食"].includes(it.text.trim());
+      pushTimeline(sec.label, it.text, it.time, meal ? "daily" : "item");
     }
   }
-  pushTimeline("", "お風呂", day.bathTime, "boxed bath");
-  pushTimeline("", "就寝", day.sleepTime, "boxed");
+  pushTimeline("", "お風呂", day.bathTime, "daily");
+  pushTimeline("", "就寝", day.sleepTime, "daily");
 
   timeline.sort((a, b) => {
     const diff = timeSortValue(a.time) - timeSortValue(b.time);
@@ -427,19 +428,19 @@ function buildPrintSheet() {
     if (row.label) previousLabel = row.label;
     else previousLabel = null;
     parts.push(`
-      <div class="pTimelineRow ${row.kind === "none" ? "pDim" : ""}">
-        <span class="pTime pTimeLeft">${row.time ? esc(row.time) : ""}</span>
+      <div class="pTimelineRow ${row.kind === "none" ? "pDim" : ""} ${row.kind === "daily" ? "pDailyRow" : ""}">
+        <span class="pTime">${row.time ? esc(row.time) : ""}</span>
         <div class="pTimelineLabel">${showLabel ? `<span class="pMagnet">${esc(row.label)}</span>` : ""}</div>
-        <span class="pChk ${row.kind.includes("boxed") || row.kind === "none" ? "pChkHidden" : ""}"></span>
-        <span class="pTimelineText ${row.kind.includes("boxed") ? "pBoxedSmall" : ""} ${["朝食","昼食","夕食"].includes(row.text) ? "pMeal" : ""} ${row.text === "お風呂" ? "pBath" : ""} ${row.text === "起きる" ? "pWake" : ""} ${row.text === "就寝" ? "pSleep" : ""}">${esc(row.text)}</span>
+        <span class="pChk ${row.kind === "daily" || row.kind === "none" ? "pChkHidden" : ""}"></span>
+        <span class="pTimelineText ${row.kind === "daily" ? "pBoxedSmall" : ""}">${esc(row.text)}</span>
       </div>`);
   }
   parts.push('</div>');
 
   parts.push(`
     <div class="pFamilyPlans">
-      <div class="pFamilyPlan"><span class="pFamilyLabel">パパの予定</span><span>${esc(day.papaSchedule).replace(/\n/g, "<br>") || "　"}</span></div>
       <div class="pFamilyPlan"><span class="pFamilyLabel">ママの予定</span><span>${esc(day.mamaSchedule).replace(/\n/g, "<br>") || "　"}</span></div>
+      <div class="pFamilyPlan"><span class="pFamilyLabel">パパの予定</span><span>${esc(day.papaSchedule).replace(/\n/g, "<br>") || "　"}</span></div>
     </div>`);
 
   $("printSheet").innerHTML = parts.join("");
