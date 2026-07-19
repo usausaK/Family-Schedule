@@ -475,8 +475,20 @@ function buildPrintSheet() {
 function printDay() {
   flushSave();
   buildPrintSheet();
-  window.print();
+
+  // iPhone版Safariでは、印刷用DOMを作った直後にwindow.print()を呼ぶと、
+  // レイアウト反映前のため印刷画面が開かなかったり、空白になることがある。
+  // 2フレーム待ってから印刷処理を開始する。
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      window.print();
+    });
+  });
 }
+
+// Safariの共有メニューなど別経路から印刷された場合にも、
+// 必ず最新内容で印刷用シートを作り直す。
+window.addEventListener("beforeprint", buildPrintSheet);
 
 // ---------------- ログイン ----------------
 
